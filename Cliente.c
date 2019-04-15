@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
     printf("host: %s        path: %s\n", host, path);
     printf("Montando Requisicao:    ");
     
-    char requisicao[30];
+    char requisicao[70];
     memset(requisicao,'\0',30);
  
     if (verifica == 1){
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
     
     saddr.sin_family = AF_INET;        
     saddr.sin_addr = *((struct in_addr *)he->h_addr);
-    saddr.sin_port = htons(5000);
+    saddr.sin_port = htons(80);
     bzero(&(saddr.sin_zero), 8);  
     
 
@@ -100,21 +100,19 @@ int main(int argc, char *argv[]){
             for (i = 0; i < 3; i++)		//get the status code
             statusRequisicao[i] = buff[i+9];
             statusRequisicao[i++] = '\0';
-
+	        printf("%s\n",statusRequisicao);
             if (atoi(statusRequisicao) == 200){
-            printf("%s\n\n",buff);
+                printf("%s\n\n",buff);
 
-             printf("Arquivo Baixado e se encontra na pasta do cliente\n");
-            data = strstr( buff, "\r\n\r\n" );
-            if ( data != NULL )
-                data += 4;
+                data = strstr( buff, "\r\n\r\n" );
+                if ( data != NULL )
+                    data += 4;
 
-            VerificaCabecalho = 0;
-            }else{
-                printf("Falha ao baixar o arquivo\n");
-                return 1;
-                
-            }
+                VerificaCabecalho = 0;
+                }else{
+                    printf("Falha ao baixar o arquivo\n");
+                    return 1;                    
+                }
         } else{
             fwrite(buff,sizeof(char),bytes, Arquivo);
         }
