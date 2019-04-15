@@ -24,13 +24,9 @@ int main(){
     int server = socket(AF_INET,SOCK_STREAM, 0);
     int csize = sizeof saddr;
     int sockfd = socket(AF_INET,SOCK_STREAM, 0);
-    char mensagem[30];
-
-
+    char mensagem[30], caminho[50];
 	FILE * Arquivo;
 
-
-    
     bind(server, (struct sockaddr *) &saddr, sizeof saddr);
     listen(server,1);
     printf("esperando conexcao");
@@ -39,14 +35,29 @@ int main(){
         client = accept(server,(struct sockaddr *) &saddr, &csize);
         if (client != -1){      
              printf("Cliente conectado"); 
-        x = recv(client,buff, sizeof buff, 0);              
-        Arquivo = fopen(buff,"rb");
+        x = recv(client,buff, sizeof buff, 0);  
+
+        int cont2;
+        for (cont2 = 4; buff[cont2] != '\0'; cont2++){
+
+            caminho[cont2-4] = buff[cont2];
+        }            
+        printf("%s",buff);
+        Arquivo = fopen(caminho,"rb");
 
         if (Arquivo != NULL){
-
+		strcpy(resposta,"HTTP/1.1 200 OK");
+		strcat(resposta,"\r\n\r\n");
+		char linha[300];
+		while(!EOF){
+		fgets(linha,300,Arquivo);
+		strcat(resposta,"\n");		
+		strcat(resposta,linha);		
+		}
+		send(client,resposta,strlen(resposta),0);    
             break;
         }else{
-            strcpy(resposta,"HTTP/1.0 404 OK\n");
+            strcpy(resposta,"HTTP/1.1 404 NF\n");
             printf("%s",resposta);
             send(client,resposta,strlen(resposta),0);      
             break;
@@ -55,5 +66,6 @@ int main(){
         fflush(stdout); 
         }
     }
+    close(server);
     return 1;
 }
